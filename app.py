@@ -190,6 +190,16 @@ price_X_train, price_X_test, price_y_train, price_y_test = train_test_split(pric
 price_model = LinearRegression()
 price_model.fit(price_X_train, price_y_train)
 
+# Load and prepare datasets for crop recommendation
+crop_recommendation_data = pd.read_csv("https://github.com/dheerajreddy71/Design_Project/raw/main/Crop_recommendation.csv")
+
+# Preprocessing for crop recommendation
+crop_X = crop_recommendation_data[['N', 'P', 'K', 'temperature', 'humidity', 'ph', 'rainfall']]
+crop_y = crop_recommendation_data['label']
+crop_X_train, crop_X_test, crop_y_train, crop_y_test = train_test_split(crop_X, crop_y, test_size=0.2, random_state=42)
+crop_model = RandomForestClassifier(n_estimators=100, random_state=42)
+crop_model.fit(crop_X_train, crop_y_train)
+
 # Streamlit app layout
 st.title("Smart Agriculture Assistant")
 
@@ -295,6 +305,35 @@ if st.button("Predict Crop Price"):
     st.write(f"Min Price: {price_predictions[0][0]}")
     st.write(f"Max Price: {price_predictions[0][1]}")
     st.write(f"Modal Price: {price_predictions[0][2]}")
+# Crop Recommendation Section
+st.header("Crop Recommendation")
+crop_nitrogen = st.number_input("Enter Nitrogen (N) level (kg/ha)")
+crop_phosphorus = st.number_input("Enter Phosphorus (P) level (kg/ha)")
+crop_potassium = st.number_input("Enter Potassium (K) level (kg/ha)")
+crop_temperature = st.number_input("Enter Temperature (°C)")
+crop_humidity = st.number_input("Enter Humidity (%)")
+crop_ph = st.number_input("Enter Soil pH level")
+crop_rainfall = st.number_input("Enter Rainfall (mm)")
+
+if st.button("Get Crop Recommendation"):
+    if all(v is not None for v in [crop_nitrogen, crop_phosphorus, crop_potassium, crop_temperature, crop_humidity, crop_ph, crop_rainfall]):
+        # Prepare input data for prediction
+        input_crop_data = pd.DataFrame({
+            'N': [crop_nitrogen],
+            'P': [crop_phosphorus],
+            'K': [crop_potassium],
+            'temperature': [crop_temperature],
+            'humidity': [crop_humidity],
+            'ph': [crop_ph],
+            'rainfall': [crop_rainfall]
+        })
+        # Predict crop recommendation
+        crop_prediction = crop_model.predict(input_crop_data)
+        recommended_crop = encode_crop.inverse_transform(crop_prediction)[0]
+        st.write(f"Recommended Crop: {recommended_crop}")
+    else:
+        st.write("Please provide all inputs.")
+
 
 if __name__ == "__main__":
     st.write("Streamlit app is running...")
