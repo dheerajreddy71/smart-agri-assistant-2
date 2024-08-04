@@ -76,17 +76,18 @@ rand = RandomForestClassifier()
 rand.fit(x_train, y_train)
 
 # Streamlit app
-st.markdown("""
-    <style>
-        .reportview-container {
-            background: url("https://github.com/dheerajreddy71/Webbuild/blob/main/background.jpg") no-repeat center center fixed;
-            background-size: cover;
-        }
-    </style>
-""", unsafe_allow_html=True)
+st.set_page_config(page_title="Smart Agri Assistant", layout="wide", page_icon="🌾")
 
-st.title("Weather Forecast and Fertilizer Recommendation System")
-
+# Add a background image
+page_bg_img = '''
+<style>
+.stApp {
+background-image: url("https://github.com/dheerajreddy71/Webbuild/raw/main/background.jpg");
+background-size: cover;
+}
+</style>
+'''
+st.markdown(page_bg_img, unsafe_allow_html=True)
 # Weather Forecast Section
 st.header("Weather Forecast for Village")
 village_name = st.text_input('Enter village name')
