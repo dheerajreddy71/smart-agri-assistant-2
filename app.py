@@ -305,34 +305,25 @@ if st.button("Predict Crop Price"):
     st.write(f"Min Price: {price_predictions[0][0]}")
     st.write(f"Max Price: {price_predictions[0][1]}")
     st.write(f"Modal Price: {price_predictions[0][2]}")
+    
 # Crop Recommendation Section
 st.header("Crop Recommendation")
-crop_nitrogen = st.number_input("Enter Nitrogen (N) level (kg/ha)")
-crop_phosphorus = st.number_input("Enter Phosphorus (P) level (kg/ha)")
-crop_potassium = st.number_input("Enter Potassium (K) level (kg/ha)")
-crop_temperature = st.number_input("Enter Temperature (°C)")
-crop_humidity = st.number_input("Enter Humidity (%)")
-crop_ph = st.number_input("Enter Soil pH level")
-crop_rainfall = st.number_input("Enter Rainfall (mm)")
+crop_nitrogen = st.number_input("Enter Nitrogen (N)", key='crop_nitrogen')
+crop_phosphorus = st.number_input("Enter Phosphorus (P)", key='crop_phosphorus')
+crop_potassium = st.number_input("Enter Potassium (K)", key='crop_potassium')
+crop_temperature = st.number_input("Enter Temperature (°C)", key='crop_temperature')
+crop_humidity = st.number_input("Enter Humidity (%)", key='crop_humidity')
+crop_ph = st.number_input("Enter pH", key='crop_ph')
+crop_rainfall = st.number_input("Enter Rainfall (mm)", key='crop_rainfall')
 
-if st.button("Get Crop Recommendation"):
+if st.button("Get Crop Recommendation", key='crop_recommendation_button'):
     if all(v is not None for v in [crop_nitrogen, crop_phosphorus, crop_potassium, crop_temperature, crop_humidity, crop_ph, crop_rainfall]):
-        # Prepare input data for prediction
-        input_crop_data = pd.DataFrame({
-            'N': [crop_nitrogen],
-            'P': [crop_phosphorus],
-            'K': [crop_potassium],
-            'temperature': [crop_temperature],
-            'humidity': [crop_humidity],
-            'ph': [crop_ph],
-            'rainfall': [crop_rainfall]
-        })
-        # Predict crop recommendation
-        crop_prediction = crop_model.predict(input_crop_data)
-        recommended_crop = encode_crop.inverse_transform(crop_prediction)[0]
+        prediction = crop_model.predict([[crop_nitrogen, crop_phosphorus, crop_potassium, crop_temperature, crop_humidity, crop_ph, crop_rainfall]])
+        recommended_crop = prediction[0]
         st.write(f"Recommended Crop: {recommended_crop}")
     else:
         st.write("Please provide all inputs.")
+
 
 
 if __name__ == "__main__":
