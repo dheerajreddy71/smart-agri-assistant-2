@@ -4,8 +4,9 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 
-# Load and preprocess data
-data = pd.read_csv('C:/Users/Windows/Downloads/fertilizer_recommendation.csv')
+# Load and preprocess data from GitHub
+url = 'https://raw.githubusercontent.com/dheerajreddy71/Design_Project/main/fertilizer_recommendation.csv'
+data = pd.read_csv(url)
 data.rename(columns={'Humidity ':'Humidity','Soil Type':'Soil_Type','Crop Type':'Crop_Type','Fertilizer Name':'Fertilizer'}, inplace=True)
 data.dropna(inplace=True)
 
