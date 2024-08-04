@@ -76,6 +76,15 @@ rand = RandomForestClassifier()
 rand.fit(x_train, y_train)
 
 # Streamlit app
+st.markdown("""
+    <style>
+        .reportview-container {
+            background: url("https://github.com/dheerajreddy71/Webbuild/blob/main/background.jpg") no-repeat center center fixed;
+            background-size: cover;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
 st.title("Weather Forecast and Fertilizer Recommendation System")
 
 # Weather Forecast Section
