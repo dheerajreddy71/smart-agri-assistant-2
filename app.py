@@ -115,9 +115,9 @@ dest_lang = languages[selected_language]
 
 # Weather Forecast Section
 st.header(translate_text("Weather Forecast for Village", dest_lang))
-village_name = st.text_input(translate_text('Enter village name', dest_lang))
+village_name = st.text_input(translate_text('Enter village name', dest_lang), key='village_name_input')
 
-if st.button(translate_text('Fetch Weather', dest_lang)):
+if st.button(translate_text('Fetch Weather', dest_lang), key='fetch_weather_button'):
     if village_name:
         latitude, longitude = get_lat_lon(village_name)
         if latitude and longitude:
@@ -138,16 +138,16 @@ if st.button(translate_text('Fetch Weather', dest_lang)):
 st.header(translate_text("Fertilizer Recommendation System", dest_lang))
 
 # Input fields for fertilizer recommendation
-temperature = st.number_input(translate_text('Temperature', dest_lang), format="%.2f")
-humidity = st.number_input(translate_text('Humidity', dest_lang), format="%.2f")
-moisture = st.number_input(translate_text('Moisture', dest_lang), format="%.2f")
-soil_type = st.selectbox(translate_text('Soil Type', dest_lang), encode_soil.classes_)
-crop_type = st.selectbox(translate_text('Crop Type', dest_lang), encode_crop.classes_)
-nitrogen = st.number_input(translate_text('Nitrogen', dest_lang), format="%.2f")
-potassium = st.number_input(translate_text('Potassium', dest_lang), format="%.2f")
-phosphorous = st.number_input(translate_text('Phosphorous', dest_lang), format="%.2f")
+temperature = st.number_input(translate_text('Temperature', dest_lang), format="%.2f", key='temperature_input')
+humidity = st.number_input(translate_text('Humidity', dest_lang), format="%.2f", key='humidity_input')
+moisture = st.number_input(translate_text('Moisture', dest_lang), format="%.2f", key='moisture_input')
+soil_type = st.selectbox(translate_text('Soil Type', dest_lang), encode_soil.classes_, key='soil_type_input')
+crop_type = st.selectbox(translate_text('Crop Type', dest_lang), encode_crop.classes_, key='crop_type_input')
+nitrogen = st.number_input(translate_text('Nitrogen', dest_lang), format="%.2f", key='nitrogen_input')
+potassium = st.number_input(translate_text('Potassium', dest_lang), format="%.2f", key='potassium_input')
+phosphorous = st.number_input(translate_text('Phosphorous', dest_lang), format="%.2f", key='phosphorous_input')
 
-if st.button(translate_text('Predict Fertilizer', dest_lang)):
+if st.button(translate_text('Predict Fertilizer', dest_lang), key='predict_fertilizer_button'):
     try:
         soil_type_encoded = encode_soil.transform([soil_type])[0]
         crop_type_encoded = encode_crop.transform([crop_type])[0]
