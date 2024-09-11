@@ -4,11 +4,25 @@ import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
+from googletrans import Translator
 
 # API keys
 geocoding_api_key = '80843f03ed6b4945a45f1bd8c51e5c2f'
 weather_api_key = 'b53305cd6b960c1984aed0acaf76aa2e'
 
+# Translator setup
+translator = Translator()
+
+# Function to translate text based on selected language
+def translate_text(text, dest_lang):
+    try:
+        translation = translator.translate(text, dest=dest_lang)
+        return translation.text
+    except Exception as e:
+        st.error(f"Translation error: {e}")
+        return text
+
+# Function to get geolocation
 def get_lat_lon(village_name):
     geocoding_url = f'https://api.opencagedata.com/geocode/v1/json?q={village_name}&key={geocoding_api_key}'
     try:
@@ -25,7 +39,8 @@ def get_lat_lon(village_name):
         st.error(f"Error fetching geocoding data: {e}")
         return None, None
 
-def get_weather_forecast(latitude, longitude):
+# Function to get weather forecast
+def get_weather_forecast(latitude, longitude, dest_lang):
     weather_url = f'https://api.openweathermap.org/data/2.5/forecast?lat={latitude}&lon={longitude}&units=metric&cnt=40&appid={weather_api_key}'
     try:
         response = requests.get(weather_url)
@@ -36,13 +51,14 @@ def get_weather_forecast(latitude, longitude):
             for item in data['list']:
                 date_time = item['dt_txt']
                 date, time = date_time.split(' ')
+                weather_desc = translate_text(item['weather'][0]['description'], dest_lang)
                 forecast.append({
                     'date': date,
                     'time': time,
                     'temp': item['main']['temp'],
                     'pressure': item['main']['pressure'],
                     'humidity': item['main']['humidity'],
-                    'weather': item['weather'][0]['description']
+                    'weather': weather_desc
                 })
             return forecast
         else:
@@ -88,46 +104,55 @@ background-size: cover;
 </style>
 '''
 st.markdown(page_bg_img, unsafe_allow_html=True)
-# Weather Forecast Section
-st.header("Weather Forecast for Village")
-village_name = st.text_input('Enter village name')
 
-if st.button('Fetch Weather'):
+# Language selection
+st.sidebar.header("Language Selection")
+languages = {'English': 'en', 'Hindi': 'hi', 'Tamil': 'ta', 'Telugu': 'te'}
+selected_language = st.sidebar.selectbox('Select language', list(languages.keys()))
+
+# Get the selected language code
+dest_lang = languages[selected_language]
+
+# Weather Forecast Section
+st.header(translate_text("Weather Forecast for Village", dest_lang))
+village_name = st.text_input(translate_text('Enter village name', dest_lang))
+
+if st.button(translate_text('Fetch Weather', dest_lang)):
     if village_name:
         latitude, longitude = get_lat_lon(village_name)
         if latitude and longitude:
-            st.write(f'Coordinates: Latitude {latitude}, Longitude {longitude}')
-            forecast = get_weather_forecast(latitude, longitude)
+            st.write(translate_text(f'Coordinates: Latitude {latitude}, Longitude {longitude}', dest_lang))
+            forecast = get_weather_forecast(latitude, longitude, dest_lang)
             if forecast:
                 df = pd.DataFrame(forecast)
-                st.write('Weather Forecast:')
+                st.write(translate_text('Weather Forecast:', dest_lang))
                 st.dataframe(df)
             else:
-                st.write('Weather forecast data not available.')
+                st.write(translate_text('Weather forecast data not available.', dest_lang))
         else:
-            st.write('Village not found.')
+            st.write(translate_text('Village not found.', dest_lang))
     else:
-        st.write('Please enter a village name.')
+        st.write(translate_text('Please enter a village name.', dest_lang))
 
 # Fertilizer Recommendation Section
-st.header("Fertilizer Recommendation System")
+st.header(translate_text("Fertilizer Recommendation System", dest_lang))
 
 # Input fields for fertilizer recommendation
-temperature = st.number_input('Temperature', format="%.2f")
-humidity = st.number_input('Humidity', format="%.2f")
-moisture = st.number_input('Moisture', format="%.2f")
-soil_type = st.selectbox('Soil Type', encode_soil.classes_)
-crop_type = st.selectbox('Crop Type', encode_crop.classes_)
-nitrogen = st.number_input('Nitrogen', format="%.2f")
-potassium = st.number_input('Potassium', format="%.2f")
-phosphorous = st.number_input('Phosphorous', format="%.2f")
+temperature = st.number_input(translate_text('Temperature', dest_lang), format="%.2f")
+humidity = st.number_input(translate_text('Humidity', dest_lang), format="%.2f")
+moisture = st.number_input(translate_text('Moisture', dest_lang), format="%.2f")
+soil_type = st.selectbox(translate_text('Soil Type', dest_lang), encode_soil.classes_)
+crop_type = st.selectbox(translate_text('Crop Type', dest_lang), encode_crop.classes_)
+nitrogen = st.number_input(translate_text('Nitrogen', dest_lang), format="%.2f")
+potassium = st.number_input(translate_text('Potassium', dest_lang), format="%.2f")
+phosphorous = st.number_input(translate_text('Phosphorous', dest_lang), format="%.2f")
 
-if st.button('Predict Fertilizer'):
+if st.button(translate_text('Predict Fertilizer', dest_lang)):
     try:
         soil_type_encoded = encode_soil.transform([soil_type])[0]
         crop_type_encoded = encode_crop.transform([crop_type])[0]
         prediction = rand.predict([[temperature, humidity, moisture, soil_type_encoded, crop_type_encoded, nitrogen, potassium, phosphorous]])
         recommended_fertilizer = encode_ferti.inverse_transform(prediction)[0]
-        st.write(f"Recommended Fertilizer: {recommended_fertilizer}")
+        st.write(translate_text(f"Recommended Fertilizer: {recommended_fertilizer}", dest_lang))
     except Exception as e:
-        st.error(f"Error: {e}")
+        st.error(translate_text(f"Error: {e}", dest_lang))
